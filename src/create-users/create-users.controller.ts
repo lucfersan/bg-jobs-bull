@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { MailService } from 'src/mail/mail.service';
+import { SendRegistrationMailProducer } from 'src/jobs/registration/send-registration-mail-producer';
 import { CreateUserDTO } from './create-user-dto';
 import { CreateUsersService } from './create-users.service';
 
@@ -8,7 +8,7 @@ import { CreateUsersService } from './create-users.service';
 export class CreateUsersController {
   constructor(
     private createUsers: CreateUsersService,
-    private mailService: MailService,
+    private sendRegistrationMailProducer: SendRegistrationMailProducer,
   ) {}
 
   @Post()
@@ -20,11 +20,10 @@ export class CreateUsersController {
 
     delete user.password;
 
-    await this.mailService.sendMail({
-      to: user.email,
-      from: 'Nest Jobs <nest@jobs.com>',
-      subject: '[NestJobs] Welcome!',
-      text: 'Welcome to our platform! 😃',
+    await this.sendRegistrationMailProducer.producer({
+      name,
+      email,
+      password,
     });
 
     return response.json(user);
