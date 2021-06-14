@@ -1,7 +1,7 @@
 import { User } from '.prisma/client';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { HashProvider } from 'src/hashProvider';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Hash } from 'src/providers/hash';
 
 type CreateUserRequest = {
   name: string;
@@ -11,10 +11,7 @@ type CreateUserRequest = {
 
 @Injectable()
 export class CreateUsersService {
-  constructor(
-    private prisma: PrismaService,
-    private hashProvider: HashProvider,
-  ) {}
+  constructor(private prisma: PrismaService, private hashProvider: Hash) {}
 
   async execute({ name, email, password }: CreateUserRequest): Promise<User> {
     const userExists = await this.prisma.user.findUnique({ where: { email } });
